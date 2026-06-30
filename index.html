@@ -722,40 +722,18 @@ import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ---------------- 3D HERO ---------------- */
-let renderer, scene, camera, composer, group, embers, clock, photoPlane;
+let renderer, scene, camera, composer, group, embers, clock, photoPlane, bokeh, floor;
 let scrollY = 0, targetScroll = 0;
 const pointer = { x:0, y:0 };
 let webgl = true;
-
-function ibeamGeometry(){
-  // Cross-section of an I-beam as a 2D shape, then extruded.
-  const w = 1.0, h = 1.6, fl = 0.26, wt = 0.22; // width, height, flange thickness, web thickness
-  const s = new THREE.Shape();
-  const x = w/2, y = h/2, wx = wt/2;
-  s.moveTo(-x, y);
-  s.lineTo(x, y);
-  s.lineTo(x, y-fl);
-  s.lineTo(wx, y-fl);
-  s.lineTo(wx, -y+fl);
-  s.lineTo(x, -y+fl);
-  s.lineTo(x, -y);
-  s.lineTo(-x, -y);
-  s.lineTo(-x, -y+fl);
-  s.lineTo(-wx, -y+fl);
-  s.lineTo(-wx, y-fl);
-  s.lineTo(-x, y-fl);
-  s.closePath();
-  const geo = new THREE.ExtrudeGeometry(s, {
-    depth: 5.2, bevelEnabled:true, bevelThickness:0.04, bevelSize:0.04, bevelSegments:2, steps:1
-  });
-  geo.center();
-  return geo;
-}
+const CAM_Z = 17;
+let FOCUS;
 
 function initThree(){
   const canvas = document.getElementById('scene');
@@ -765,79 +743,112 @@ function initThree(){
   renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
   renderer.setSize(innerWidth, innerHeight);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.92;
+  renderer.toneMappingExposure = 0.95;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x06070a, 0.045);
+  scene.fog = new THREE.FogExp2(0x05060a, 0.032);
 
-  camera = new THREE.PerspectiveCamera(42, innerWidth/innerHeight, 0.1, 100);
-  camera.position.set(0, 0, 16);
+  camera = new THREE.PerspectiveCamera(38, innerWidth/innerHeight, 0.1, 120);
+  camera.position.set(0, 1.2, CAM_Z);
+  FOCUS = new THREE.Vector3(3, 0.3, 0);
 
   // environment reflections
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 
-  // lights
-  const key = new THREE.DirectionalLight(0xcfe2ff, 1.3); key.position.set(5,8,6); scene.add(key);
-  const molten1 = new THREE.PointLight(0xff6a1a, 34, 32, 2); molten1.position.set(-6,-2,4); scene.add(molten1);
-  const molten2 = new THREE.PointLight(0xffb347, 22, 32, 2); molten2.position.set(6,4,-2); scene.add(molten2);
-  scene.add(new THREE.AmbientLight(0x223044, 0.5));
+  const rng = (a,b)=>a+Math.random()*(b-a);
 
-  // steel material
-  const steelMat = new THREE.MeshStandardMaterial({
-    color:0x8e9bad, metalness:1.0, roughness:0.36, envMapIntensity:1.0
-  });
+  // ---- realistic lighting: cool key (shadows) + warm forge rim + soft fill ----
+  const key = new THREE.DirectionalLight(0xdce8ff, 2.4);
+  key.position.set(7, 12, 9);
+  key.castShadow = true;
+  key.shadow.mapSize.set(2048, 2048);
+  key.shadow.camera.near = 0.5; key.shadow.camera.far = 48;
+  key.shadow.camera.left = -16; key.shadow.camera.right = 16;
+  key.shadow.camera.top = 16; key.shadow.camera.bottom = -16;
+  key.shadow.bias = -0.0004; key.shadow.radius = 5;
+  scene.add(key);
+  const moltenRim = new THREE.PointLight(0xff6a1a, 90, 46, 2); moltenRim.position.set(-9,-1.5,7); scene.add(moltenRim);
+  const moltenBack = new THREE.PointLight(0xffb347, 36, 40, 2); moltenBack.position.set(8,5,-4); scene.add(moltenBack);
+  scene.add(new THREE.HemisphereLight(0x2a3950, 0x070709, 0.55));
 
-  // real forge photo as a textured plane behind the 3D steel (composited in-scene)
+  // ---- reflective forge floor (catches shadows + sheen) ----
+  floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(160,160),
+    new THREE.MeshStandardMaterial({ color:0x070809, metalness:0.55, roughness:0.42, envMapIntensity:0.6 })
+  );
+  floor.rotation.x = -Math.PI/2;
+  floor.receiveShadow = true;
+
+  // ---- real forge photo as a darker atmospheric backdrop ----
   const tex = new THREE.TextureLoader().load('assets/hero-banner.jpg');
   tex.colorSpace = THREE.SRGBColorSpace;
-  const planeMat = new THREE.MeshBasicMaterial({ map:tex, transparent:true, opacity:1, toneMapped:false, fog:false });
-  photoPlane = new THREE.Mesh(new THREE.PlaneGeometry(46,26), planeMat);
-  photoPlane.position.set(0,0,-7);
-  scene.add(photoPlane);
+  const planeMat = new THREE.MeshBasicMaterial({ map:tex, color:0x6b6b74, transparent:true, opacity:0.78, toneMapped:false, fog:false });
+  photoPlane = new THREE.Mesh(new THREE.PlaneGeometry(64,36), planeMat);
+  photoPlane.position.set(0, 4, -13);
 
-  // group of I-beams arranged around the frame edges (so they don't cover the worker)
+  // ---- realistic round-steel-bar bundle (hex close-packed, like the product) ----
+  const r = 0.62, L = 14, dx = 2*r, dy = r*Math.sqrt(3), rows = 6, bottom = 6;
+  const barGeo = new THREE.CylinderGeometry(r, r, L, 44, 1);
+  barGeo.rotateX(Math.PI/2);                 // lay bars along Z so round ends face the camera
   group = new THREE.Group();
-  const geo = ibeamGeometry();
-  const rng = (a,b)=>a+Math.random()*(b-a);
-  for(let i=0;i<7;i++){
-    const m = new THREE.Mesh(geo, steelMat);
-    const ring = i*((Math.PI*2)/7);
-    const rad = rng(5.0,7.2);
-    m.position.set(Math.cos(ring)*rad, rng(-3.5,3.5), Math.sin(ring)*rad + 1.5);
-    m.rotation.set(rng(0,Math.PI), rng(0,Math.PI), rng(0,Math.PI));
-    m.scale.setScalar(rng(0.45,0.8));
-    group.add(m);
+  const yC = (rows-1)*dy/2;
+  let floorY = 0;
+  for(let k=0;k<rows;k++){
+    const count = bottom - k;
+    const rowW = (count-1)*dx;
+    for(let i=0;i<count;i++){
+      // per-bar material variance → bars aren't identical (more realistic)
+      const mat = new THREE.MeshPhysicalMaterial({
+        color:new THREE.Color().setHSL(0.6, 0.06, rng(0.46,0.56)),
+        metalness:1.0, roughness:rng(0.3,0.46), envMapIntensity:1.1, clearcoat:0.15, clearcoatRoughness:0.4
+      });
+      const bar = new THREE.Mesh(barGeo, mat);
+      bar.castShadow = true; bar.receiveShadow = true;
+      const y = k*dy - yC;
+      bar.position.set(i*dx - rowW/2, y, rng(-0.12,0.12));
+      bar.rotation.z = rng(-0.015,0.015);
+      group.add(bar);
+      floorY = Math.min(floorY, y - r);
+    }
   }
-  scene.add(group);
+  group.position.set(3.0, 0.4, 0);
+  group.rotation.y = -0.5;
 
-  // embers (points)
-  const COUNT = 380;
+  floor.position.y = group.position.y + floorY - 0.02;
+  scene.add(floor, photoPlane, group);
+
+  // floating embers / dust motes (subtle, drifting up)
+  const COUNT = 220;
   const pos = new Float32Array(COUNT*3);
   for(let i=0;i<COUNT;i++){
     pos[i*3]   = rng(-14,14);
-    pos[i*3+1] = rng(-10,10);
-    pos[i*3+2] = rng(-8,8);
+    pos[i*3+1] = rng(-6,10);
+    pos[i*3+2] = rng(-6,8);
   }
   const pgeo = new THREE.BufferGeometry();
   pgeo.setAttribute('position', new THREE.BufferAttribute(pos,3));
-  const pmat = new THREE.PointsMaterial({ color:0xff8a3c, size:0.07, transparent:true, opacity:0.9, blending:THREE.AdditiveBlending, depthWrite:false });
+  const pmat = new THREE.PointsMaterial({ color:0xff8a3c, size:0.05, transparent:true, opacity:0.65, blending:THREE.AdditiveBlending, depthWrite:false });
   embers = new THREE.Points(pgeo, pmat);
   scene.add(embers);
 
-  // post-processing bloom
+  // post-processing: bloom (subtle, highlights only) + cinematic depth of field
   composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
-  const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight), 0.42, 0.7, 0.82);
-  composer.addPass(bloom);
+  composer.addPass(new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight), 0.34, 0.6, 0.85));
+  bokeh = new BokehPass(scene, camera, { focus: CAM_Z, aperture: 0.00021, maxblur: 0.008,
+    width: innerWidth, height: innerHeight });
+  composer.addPass(bokeh);
 
   clock = new THREE.Clock();
   animate();
 
-  // intro: pull camera in
+  // cinematic intro: slow dolly-in (z owned by gsap; x/y eased in animate)
   if(!reduced && window.gsap){
-    camera.position.set(0,0,30);
-    gsap.to(camera.position, { z:16, duration:2.4, ease:'power3.out', delay:0.2 });
+    camera.position.set(0, 1.2, CAM_Z + 13);
+    gsap.to(camera.position, { z:CAM_Z, duration:2.8, ease:'power3.out', delay:0.2 });
   }
 }
 
@@ -847,30 +858,27 @@ function animate(){
   scrollY += (targetScroll - scrollY) * 0.06;
 
   if(group){
-    group.rotation.y = t*0.06 + scrollY*0.0016;
-    group.rotation.x = Math.sin(t*0.18)*0.06 + scrollY*0.0004;
-    group.children.forEach((m,i)=>{ m.rotation.x += 0.0009*(i%3+1); m.rotation.z += 0.0006; });
+    // heavy steel: slow, weighty motion
+    group.rotation.y = -0.5 + Math.sin(t*0.14)*0.13 + scrollY*0.0007;
+    group.position.y = 0.4 + Math.sin(t*0.4)*0.03;
   }
   if(embers){
-    embers.rotation.y = t*0.02;
     const p = embers.geometry.attributes.position.array;
-    for(let i=1;i<p.length;i+=3){ p[i]+=0.006; if(p[i]>10) p[i]=-10; }
+    for(let i=1;i<p.length;i+=3){ p[i]+=0.005; if(p[i]>10) p[i]=-6; }
     embers.geometry.attributes.position.needsUpdate = true;
   }
   if(photoPlane){
-    // slow cinematic drift + parallax, fade out as the hero scrolls away
-    photoPlane.position.x = pointer.x*0.6 - scrollY*0.0008;
-    photoPlane.position.y = -pointer.y*0.4 + scrollY*0.0026;
-    const fade = Math.max(0, 1 - scrollY/(innerHeight*0.85));
+    photoPlane.position.x = pointer.x*0.5 - scrollY*0.0008;
+    const fade = Math.max(0, 1 - scrollY/(innerHeight*0.8)) * 0.78;
     photoPlane.material.opacity = fade;
     photoPlane.visible = fade > 0.01;
   }
-  // parallax + scroll dolly
+  // cinematic parallax (z owned by the intro tween)
   if(camera){
-    const baseZ = 16 + scrollY*0.004;
-    camera.position.x += ((pointer.x*2) - camera.position.x)*0.04;
-    camera.position.y += ((-pointer.y*1.4 - scrollY*0.003) - camera.position.y)*0.04;
-    camera.lookAt(0,0,0);
+    camera.position.x += ((0.4 + pointer.x*2.0) - camera.position.x)*0.04;
+    camera.position.y += ((1.2 - pointer.y*1.1 - scrollY*0.003) - camera.position.y)*0.04;
+    camera.lookAt(2.4, 0.2, 0);
+    if(bokeh) bokeh.uniforms['focus'].value = camera.position.distanceTo(FOCUS);
   }
   composer ? composer.render() : renderer.render(scene,camera);
 }
