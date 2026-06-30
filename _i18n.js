@@ -389,30 +389,26 @@ const T = {
 
 const URLS = {
   en: 'https://easydecohome.github.io/shengxisteel/',
-  de: 'https://easydecohome.github.io/shengxisteel/de/',
-  es: 'https://easydecohome.github.io/shengxisteel/es/'
+  de: 'https://easydecohome.github.io/shengxisteel/de.html',
+  es: 'https://easydecohome.github.io/shengxisteel/es.html'
 };
 
+// flat files in the root (no language subfolders => no directory listings)
 function build(lang){
   let h = head;
   for(const [a,b] of T[lang]) h = h.split(a).join(b);
   let doc = h + tail;
-  // lang attribute
   doc = doc.replace('<html lang="en">', '<html lang="'+lang+'">');
-  // asset paths now live one folder deeper
-  doc = doc.split('assets/').join('../assets/');
+  // assets stay at ./assets/ since these are root-level files
   // canonical -> this page
   doc = doc.replace('<link rel="canonical" href="'+URLS.en+'" />', '<link rel="canonical" href="'+URLS[lang]+'" />');
-  // language switcher: active state + relative hrefs from /<lang>/
-  doc = doc
-    .replace('<a href="./" class="on" hreflang="en">EN</a>', '<a href="../" hreflang="en">EN</a>')
-    .replace('<a href="de/" hreflang="de">DE</a>', lang==='de' ? '<a href="./" class="on" hreflang="de">DE</a>' : '<a href="../de/" hreflang="de">DE</a>')
-    .replace('<a href="es/" hreflang="es">ES</a>', lang==='es' ? '<a href="./" class="on" hreflang="es">ES</a>' : '<a href="../es/" hreflang="es">ES</a>');
-  fs.mkdirSync(lang, { recursive:true });
-  fs.writeFileSync(lang+'/index.html', doc);
-  // quick stats
-  const leftEN = (doc.match(/Request a Quote|Get a quote|Quality &amp; Compliance/g)||[]).length;
-  console.log(lang+'/index.html written — '+doc.length+' bytes; residual EN markers: '+leftEN);
+  // language switcher: move the active state to this language (hrefs identical on every page)
+  doc = doc.replace('<a href="index.html" class="on" hreflang="en">EN</a>', '<a href="index.html" hreflang="en">EN</a>');
+  if(lang==='de') doc = doc.replace('<a href="de.html" hreflang="de">DE</a>', '<a href="de.html" class="on" hreflang="de">DE</a>');
+  if(lang==='es') doc = doc.replace('<a href="es.html" hreflang="es">ES</a>', '<a href="es.html" class="on" hreflang="es">ES</a>');
+  fs.writeFileSync(lang+'.html', doc);
+  const leftEN = (doc.match(/Request a Quote|Quality &amp; Compliance|Industries Served/g)||[]).length;
+  console.log(lang+'.html written — '+doc.length+' bytes; residual EN HTML markers: '+leftEN);
 }
 
 build('de');
