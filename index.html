@@ -164,6 +164,8 @@ section.block{position:relative;z-index:2;padding:130px 0}
   color:var(--molten-2);border:1px solid rgba(255,179,71,.3);border-radius:30px;padding:5px 11px}
 .feat h4{font-family:'Space Grotesk';font-size:.98rem;font-weight:600;line-height:1.25;letter-spacing:-.01em}
 .feat p{color:var(--muted);font-size:.82rem}
+.feat .ft::after{content:"Send inquiry →";color:var(--molten-2);font-family:'Space Grotesk';font-size:.78rem;letter-spacing:.03em;margin-top:6px;transition:transform .3s}
+.feat:hover .ft::after{transform:translateX(5px)}
 @media(max-width:980px){.feat-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:560px){.feat-grid{grid-template-columns:1fr}}
 
@@ -258,6 +260,54 @@ section.block{position:relative;z-index:2;padding:130px 0}
 .form-msg.ok{display:block;background:rgba(46,160,90,.12);border:1px solid rgba(46,160,90,.4);color:#7fe3a6}
 .form-msg.err{display:block;background:rgba(220,70,50,.12);border:1px solid rgba(220,70,50,.4);color:#ff9d8c}
 @media(max-width:560px){.fgrid{grid-template-columns:1fr}}
+
+/* ---------- Inquiry modal (Alibaba-style order form) ---------- */
+.modal{position:fixed;inset:0;z-index:300;display:none;align-items:flex-start;justify-content:center;
+  padding:40px 18px;overflow-y:auto;background:rgba(3,4,6,.72);backdrop-filter:blur(8px)}
+.modal.open{display:flex}
+.modal-card{width:100%;max-width:720px;background:#0c0e13;border:1px solid var(--line);border-radius:20px;
+  margin:auto;position:relative;animation:popin .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes popin{from{opacity:0;transform:translateY(24px) scale(.98)}to{opacity:1;transform:none}}
+.modal-head{display:flex;align-items:center;gap:16px;padding:22px 26px;border-bottom:1px solid var(--line)}
+.modal-head .thumb{flex:none;width:58px;height:58px;border-radius:12px;overflow:hidden;background:#fff;border:1px solid var(--line)}
+.modal-head .thumb img{width:100%;height:100%;object-fit:cover}
+.modal-head .ht small{display:block;color:var(--molten-2);font-family:'Space Grotesk';font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:4px}
+.modal-head .ht b{font-family:'Space Grotesk';font-size:1.05rem;font-weight:600;line-height:1.2;display:block}
+.modal-close{margin-left:auto;flex:none;width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:none;color:var(--ink);
+  font-size:1.2rem;cursor:pointer;transition:.25s;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{border-color:var(--molten);color:var(--molten-2)}
+.modal-body{padding:24px 26px}
+.modal-body .blk-label{font-family:'Space Grotesk';font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:4px 0 12px}
+.chips{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:24px}
+.chip{font-size:.82rem;border:1px solid var(--line);background:rgba(255,255,255,.02);color:var(--steel);
+  border-radius:30px;padding:9px 15px;cursor:pointer;transition:.2s;user-select:none}
+.chip:hover{border-color:var(--steel)}
+.chip.on{background:rgba(255,106,26,.14);border-color:var(--molten);color:var(--core)}
+.chip.on::before{content:"✓ ";color:var(--molten-2)}
+.qty-row{display:grid;grid-template-columns:1fr 130px;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.qty-row input{border:none!important;border-radius:0!important;box-shadow:none!important}
+.qty-row select{border:none!important;border-left:1px solid var(--line)!important;border-radius:0!important;background-color:rgba(255,255,255,.03)}
+.price-row{display:grid;grid-template-columns:110px 1fr;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.price-row select{border:none!important;border-right:1px solid var(--line)!important;border-radius:0!important}
+.price-row input{border:none!important;border-radius:0!important;box-shadow:none!important}
+.modal-foot{padding:20px 26px 26px;border-top:1px solid var(--line)}
+.modal-foot .btn{width:100%;justify-content:center;border:none;cursor:pointer}
+.trust{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin-top:16px;color:var(--muted);font-size:.76rem}
+.trust span{display:inline-flex;align-items:center;gap:6px}
+.trust span::before{content:"●";color:var(--molten-2);font-size:.6rem}
+.btn-quote{cursor:pointer}
+
+/* ---------- Floating CTA (FAB) ---------- */
+.fab{position:fixed;right:24px;bottom:24px;z-index:120;display:inline-flex;align-items:center;gap:10px;
+  background:linear-gradient(100deg,var(--molten),var(--molten-2));color:#1a0e04;border:none;cursor:pointer;
+  font-family:'Space Grotesk';font-weight:600;font-size:.92rem;padding:14px 22px;border-radius:46px;
+  box-shadow:0 12px 34px rgba(255,106,26,.4);transition:transform .25s,box-shadow .25s;opacity:0;transform:translateY(20px)}
+.fab.show{opacity:1;transform:none}
+.fab:hover{transform:translateY(-3px);box-shadow:0 18px 44px rgba(255,106,26,.5)}
+.fab .fab-ic{font-size:1.05rem}
+.fab .fab-pulse{position:absolute;inset:0;border-radius:46px;border:2px solid var(--molten-2);animation:fabp 2.2s infinite;pointer-events:none}
+@keyframes fabp{0%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(1.25)}}
+@media(max-width:560px){.fab .fab-txt{display:none}.fab{padding:15px;border-radius:50%}}
 
 /* ---------- CTA ---------- */
 .cta{position:relative;z-index:2;padding:140px 0;text-align:center}
@@ -385,9 +435,9 @@ footer{position:relative;z-index:2;border-top:1px solid var(--line);padding:70px
       <p>High-quality steel conforming to ASTM, EN, JIS and GB standards — engineered for automotive, energy, machinery and construction.</p>
     </div>
     <div class="prod-grid">
-      <a class="card reveal" href="#contact"><div class="ph"><img src="assets/steel-pipe.jpg" alt="Seamless steel pipe" loading="lazy"></div><div class="body"><div class="idx">01 — TUBULAR</div><h3>Seamless Steel Pipe</h3><p>Carbon Steel Pipe · Alloy Steel Tubes · Precision Steel Tube — engineered for pressure and high-temperature service.</p><span class="arrow">View range <i>→</i></span></div></a>
-      <a class="card reveal" href="#contact"><div class="ph"><img src="assets/product-03.jpg" alt="Steel plate" loading="lazy"></div><div class="body"><div class="idx">02 — FLAT</div><h3>Steel Plate</h3><p>Carbon Steel Plate · Alloy Steel Plate — flat, rolled plate cut to size for fabrication and structural work.</p><span class="arrow">View range <i>→</i></span></div></a>
-      <a class="card reveal" href="#contact"><div class="ph"><img src="assets/product-02.jpg" alt="Steel rods" loading="lazy"></div><div class="body"><div class="idx">03 — LONG</div><h3>Steel Rods</h3><p>Carbon Steel Bars · Alloy Steel Bars · Cold-Drawn Bright Bars — tight tolerance, superior surface finish.</p><span class="arrow">View range <i>→</i></span></div></a>
+      <a class="card reveal" href="#contact"><div class="ph"><img src="assets/steel-pipe.jpg" alt="Seamless steel pipe" loading="lazy"></div><div class="body"><div class="idx">01 — TUBULAR</div><h3>Seamless Steel Pipe</h3><p>Carbon Steel Pipe · Alloy Steel Tubes · Precision Steel Tube — engineered for pressure and high-temperature service.</p><span class="arrow">Get a quote <i>→</i></span></div></a>
+      <a class="card reveal" href="#contact"><div class="ph"><img src="assets/product-03.jpg" alt="Steel plate" loading="lazy"></div><div class="body"><div class="idx">02 — FLAT</div><h3>Steel Plate</h3><p>Carbon Steel Plate · Alloy Steel Plate — flat, rolled plate cut to size for fabrication and structural work.</p><span class="arrow">Get a quote <i>→</i></span></div></a>
+      <a class="card reveal" href="#contact"><div class="ph"><img src="assets/product-02.jpg" alt="Steel rods" loading="lazy"></div><div class="body"><div class="idx">03 — LONG</div><h3>Steel Rods</h3><p>Carbon Steel Bars · Alloy Steel Bars · Cold-Drawn Bright Bars — tight tolerance, superior surface finish.</p><span class="arrow">Get a quote <i>→</i></span></div></a>
     </div>
 
     <div class="sec-head reveal" style="margin-top:90px">
@@ -583,6 +633,79 @@ footer{position:relative;z-index:2;border-top:1px solid var(--line);padding:70px
     </div>
   </div>
 </footer>
+
+<!-- Floating persistent CTA -->
+<button class="fab" id="fab" aria-label="Get a quote">
+  <span class="fab-pulse"></span>
+  <span class="fab-ic">✉</span>
+  <span class="fab-txt">Get a Quote</span>
+</button>
+
+<!-- Inquiry modal (Alibaba-style product order form) -->
+<div class="modal" id="inquiryModal" role="dialog" aria-modal="true" aria-labelledby="invName">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="thumb"><img id="invThumb" src="assets/prod-a.jpg" alt=""></div>
+      <div class="ht"><small>Send Inquiry — reply within 24h</small><b id="invName">Steel product</b></div>
+      <button class="modal-close" id="invClose" aria-label="Close">✕</button>
+    </div>
+    <form id="inquiryForm">
+      <div class="modal-body">
+        <div class="reassure" style="display:flex;gap:6px;align-items:center;color:var(--muted);font-size:.85rem;margin-bottom:18px">
+          <span style="color:var(--molten-2)">●</span> Direct from the manufacturer · MOQ negotiable · Free samples available
+        </div>
+
+        <div class="blk-label">I want to know <span style="text-transform:none;letter-spacing:0;color:#5b6473">(tap to add)</span></div>
+        <div class="chips" id="invChips">
+          <span class="chip" data-q="Please send your best price and minimum order quantity (MOQ).">Best price &amp; MOQ</span>
+          <span class="chip" data-q="What is the delivery / lead time?">Delivery time</span>
+          <span class="chip" data-q="Can you provide free samples?">Free samples</span>
+          <span class="chip" data-q="Please include the mill test certificate (MTC) and material standard.">Mill test certificate</span>
+          <span class="chip" data-q="What payment terms do you accept?">Payment terms</span>
+          <span class="chip" data-q="Is the product customizable to my drawing/spec?">Customization</span>
+        </div>
+
+        <div class="blk-label">Order details</div>
+        <div class="fgrid">
+          <div class="field"><label>Quantity</label>
+            <div class="qty-row">
+              <input name="quantity" type="text" inputmode="decimal" placeholder="e.g. 50">
+              <select name="unit"><option>Tons</option><option>Kilograms</option><option>Pieces</option><option>Meters</option><option>Containers</option></select>
+            </div>
+          </div>
+          <div class="field"><label>Target price</label>
+            <div class="price-row">
+              <select name="currency"><option>USD</option><option>EUR</option><option>CNY</option></select>
+              <input name="targetprice" type="text" inputmode="decimal" placeholder="per unit (optional)">
+            </div>
+          </div>
+          <div class="field"><label>Trade term</label>
+            <select name="tradeterm"><option value="" disabled selected>Select</option><option>FOB</option><option>CIF</option><option>EXW</option><option>DDP</option><option>DAP</option></select>
+          </div>
+          <div class="field"><label>Destination port / country</label><input name="destination" type="text" placeholder="e.g. Hamburg, Germany"></div>
+          <div class="field full"><label>Required by / lead time</label><input name="leadtime" type="text" placeholder="e.g. within 30 days"></div>
+        </div>
+
+        <div class="blk-label" style="margin-top:22px">Your contact</div>
+        <div class="fgrid">
+          <div class="field"><label>Full name <span class="req">*</span></label><input name="name" type="text" placeholder="Your name" required></div>
+          <div class="field"><label>Email <span class="req">*</span></label><input name="email" type="email" placeholder="you@company.com" required></div>
+          <div class="field"><label>Company</label><input name="company" type="text" placeholder="Company name"></div>
+          <div class="field"><label>WhatsApp / phone</label><input name="phone" type="text" placeholder="+__ …"></div>
+          <div class="field full"><label>Message</label><textarea name="message" placeholder="Your requirements…"></textarea></div>
+        </div>
+        <div class="form-msg" id="invMsg" role="status" aria-live="polite"></div>
+      </div>
+      <div class="modal-foot">
+        <input type="hidden" name="product" id="invProductField">
+        <button class="btn primary" type="submit">Send Inquiry →</button>
+        <div class="trust">
+          <span>ISO 9001</span><span>SGS / BV / TÜV</span><span>Reply within 24h</span><span>Free samples</span>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
 
 <!-- ===== libraries ===== -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -845,6 +968,96 @@ function initForm(){
   });
 }
 
+/* ---------------- Inquiry modal (Alibaba-style ordering) ---------------- */
+function initInquiry(){
+  const modal = document.getElementById('inquiryModal');
+  if(!modal) return;
+  const form = document.getElementById('inquiryForm');
+  const nameEl = document.getElementById('invName');
+  const thumb = document.getElementById('invThumb');
+  const prodField = document.getElementById('invProductField');
+  const ta = form.message;
+  const chips = [...document.querySelectorAll('#invChips .chip')];
+  const msg = document.getElementById('invMsg');
+  let gen = '';
+
+  function rebuild(){
+    const lines = ['Inquiry about: ' + prodField.value, ''];
+    chips.filter(c=>c.classList.contains('on')).forEach(c=> lines.push('• ' + c.dataset.q));
+    gen = lines.join('\n');
+    if(ta.value === '' || ta.value === ta.dataset.lastgen){ ta.value = gen; ta.dataset.lastgen = gen; }
+  }
+
+  window.openInquiry = function(product, img){
+    prodField.value = product || 'General inquiry';
+    nameEl.textContent = product || 'General inquiry';
+    if(img) thumb.src = img;
+    chips.forEach(c=>c.classList.remove('on'));
+    msg.className = 'form-msg'; msg.textContent = '';
+    ta.value = ''; rebuild();
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(()=>form.name.focus(), 60);
+  };
+  function close(){ modal.classList.remove('open'); document.body.style.overflow=''; }
+
+  chips.forEach(c=> c.addEventListener('click', ()=>{ c.classList.toggle('on'); rebuild(); }));
+  document.getElementById('invClose').addEventListener('click', close);
+  modal.addEventListener('click', e=>{ if(e.target===modal) close(); });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape' && modal.classList.contains('open')) close(); });
+
+  // open from every product card + featured product
+  document.querySelectorAll('.prod-grid .card, .feat').forEach(card=>{
+    card.addEventListener('click', e=>{
+      e.preventDefault();
+      const title = card.querySelector('h3,h4');
+      const im = card.querySelector('img');
+      openInquiry(title ? title.textContent.trim() : 'Steel product', im ? im.getAttribute('src') : null);
+    });
+  });
+  // floating CTA
+  const fab = document.getElementById('fab');
+  if(fab){
+    fab.addEventListener('click', ()=> openInquiry('General inquiry', 'assets/logo.png'));
+    const toggleFab = ()=> fab.classList.toggle('show', window.scrollY > window.innerHeight*0.6);
+    addEventListener('scroll', toggleFab); toggleFab();
+  }
+
+  // submit
+  const showMsg = (t,ok)=>{ msg.textContent=t; msg.className='form-msg '+(ok?'ok':'err'); };
+  form.addEventListener('submit', async e=>{
+    e.preventDefault();
+    const d = Object.fromEntries(new FormData(form).entries());
+    if(!d.name || !d.email){ showMsg('Please enter your name and email.', false); return; }
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email)){ showMsg('Please enter a valid email address.', false); return; }
+
+    if(FORM_ENDPOINT){
+      try{
+        const res = await fetch(FORM_ENDPOINT,{method:'POST',headers:{'Accept':'application/json'},body:new FormData(form)});
+        if(res.ok){ form.reset(); showMsg('Thank you! Your inquiry has been sent — we reply within 24 hours.', true); }
+        else showMsg('Something went wrong. Please email '+CONTACT_EMAIL+'.', false);
+      }catch(err){ showMsg('Network error. Please email '+CONTACT_EMAIL+'.', false); }
+      return;
+    }
+    const subject = 'Inquiry: ' + d.product + ' — ' + (d.company || d.name);
+    const body =
+      'PRODUCT INQUIRY\n\n' +
+      'Product:     ' + d.product + '\n' +
+      'Quantity:    ' + ((d.quantity||'-') + ' ' + (d.unit||'')) + '\n' +
+      'Target price:' + ' ' + (d.targetprice ? (d.currency+' '+d.targetprice) : '-') + '\n' +
+      'Trade term:  ' + (d.tradeterm || '-') + '\n' +
+      'Destination: ' + (d.destination || '-') + '\n' +
+      'Lead time:   ' + (d.leadtime || '-') + '\n\n' +
+      'Name:        ' + d.name + '\n' +
+      'Company:     ' + (d.company || '-') + '\n' +
+      'Email:       ' + d.email + '\n' +
+      'WhatsApp:    ' + (d.phone || '-') + '\n\n' +
+      'Message:\n' + (d.message || '-') + '\n';
+    window.location.href = 'mailto:'+CONTACT_EMAIL+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+    showMsg('Opening your email app with the inquiry pre-filled. If nothing happens, email '+CONTACT_EMAIL+'.', true);
+  });
+}
+
 /* ---------------- Preloader ---------------- */
 function runPreloader(){
   const bar = document.getElementById('plBar');
@@ -864,6 +1077,7 @@ function runPreloader(){
     document.body.style.overflow='';
     initUI();
     initForm();
+    initInquiry();
   }
 }
 
