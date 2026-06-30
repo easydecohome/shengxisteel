@@ -309,6 +309,56 @@ section.block{position:relative;z-index:2;padding:130px 0}
 @keyframes fabp{0%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(1.25)}}
 @media(max-width:560px){.fab .fab-txt{display:none}.fab{padding:15px;border-radius:50%}}
 
+/* ---------- AI chat assistant ---------- */
+.chat-launch{position:fixed;right:24px;bottom:24px;z-index:130;width:62px;height:62px;border-radius:50%;border:none;cursor:pointer;
+  background:linear-gradient(135deg,var(--molten),var(--molten-2));box-shadow:0 12px 34px rgba(255,106,26,.45);
+  display:flex;align-items:center;justify-content:center;color:#1a0e04;transition:transform .25s,box-shadow .25s}
+.chat-launch:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 18px 44px rgba(255,106,26,.55)}
+.chat-launch svg{width:28px;height:28px}
+.chat-launch .ping{position:absolute;inset:0;border-radius:50%;border:2px solid var(--molten-2);animation:fabp 2.2s infinite;pointer-events:none}
+.chat-launch .online{position:absolute;top:4px;right:4px;width:13px;height:13px;border-radius:50%;background:#2fd07a;border:2px solid #1a0e04}
+.chat-launch.hide{opacity:0;visibility:hidden;transform:scale(.6)}
+.chat-greet{position:fixed;right:96px;bottom:34px;z-index:129;max-width:230px;background:#11141b;border:1px solid var(--line);
+  border-radius:14px 14px 2px 14px;padding:13px 16px;font-size:.86rem;color:var(--ink);box-shadow:0 14px 40px rgba(0,0,0,.5);
+  opacity:0;transform:translateY(10px) scale(.96);transition:.4s;pointer-events:none}
+.chat-greet.show{opacity:1;transform:none;pointer-events:auto}
+.chat-greet b{color:var(--molten-2)}
+.chat-greet .x{position:absolute;top:-8px;left:-8px;width:22px;height:22px;border-radius:50%;background:#11141b;border:1px solid var(--line);color:var(--muted);cursor:pointer;font-size:.8rem;line-height:1;display:flex;align-items:center;justify-content:center}
+
+.chat-panel{position:fixed;right:24px;bottom:24px;z-index:131;width:380px;max-width:calc(100vw - 32px);height:580px;max-height:calc(100vh - 48px);
+  background:#0b0d12;border:1px solid var(--line);border-radius:20px;overflow:hidden;display:none;flex-direction:column;
+  box-shadow:0 30px 80px rgba(0,0,0,.6);transform-origin:bottom right}
+.chat-panel.open{display:flex;animation:popin .32s cubic-bezier(.2,.8,.2,1)}
+.chat-head{display:flex;align-items:center;gap:12px;padding:16px 18px;background:linear-gradient(120deg,#15110c,#0b0d12);border-bottom:1px solid var(--line)}
+.chat-av{flex:none;width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--molten),var(--molten-2));display:flex;align-items:center;justify-content:center;color:#1a0e04;font-family:'Space Grotesk';font-weight:700;font-size:1.05rem;position:relative}
+.chat-av .online{position:absolute;bottom:0;right:0;width:11px;height:11px;border-radius:50%;background:#2fd07a;border:2px solid #0b0d12}
+.chat-head .hh b{font-family:'Space Grotesk';font-size:.98rem;display:block}
+.chat-head .hh small{color:#2fd07a;font-size:.74rem}
+.chat-head .cx{margin-left:auto;width:34px;height:34px;border-radius:9px;border:1px solid var(--line);background:none;color:var(--ink);cursor:pointer;font-size:1.1rem;transition:.25s}
+.chat-head .cx:hover{border-color:var(--molten);color:var(--molten-2)}
+.chat-body{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:12px;scrollbar-width:thin;scrollbar-color:#2a2f3a transparent}
+.chat-body::-webkit-scrollbar{width:6px}.chat-body::-webkit-scrollbar-thumb{background:#2a2f3a;border-radius:6px}
+.msg{max-width:82%;padding:11px 14px;border-radius:14px;font-size:.9rem;line-height:1.5;animation:msgin .3s ease}
+@keyframes msgin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.msg.bot{align-self:flex-start;background:#171a22;border:1px solid var(--line);border-bottom-left-radius:4px;color:var(--ink)}
+.msg.user{align-self:flex-end;background:linear-gradient(120deg,var(--molten),var(--molten-2));color:#1a0e04;border-bottom-right-radius:4px;font-weight:500}
+.msg a{color:var(--molten-2);text-decoration:underline}
+.msg.user a{color:#3a1e08}
+.typing{align-self:flex-start;background:#171a22;border:1px solid var(--line);border-radius:14px;border-bottom-left-radius:4px;padding:13px 16px;display:flex;gap:5px}
+.typing i{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:typ 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+@keyframes typ{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+.chat-qr{display:flex;flex-wrap:wrap;gap:8px;padding:0 18px 12px}
+.chat-qr button{font-size:.8rem;border:1px solid rgba(255,179,71,.35);background:rgba(255,106,26,.08);color:var(--core);
+  border-radius:30px;padding:8px 13px;cursor:pointer;transition:.2s;font-family:'Inter',sans-serif}
+.chat-qr button:hover{background:rgba(255,106,26,.18);border-color:var(--molten)}
+.chat-input{display:flex;gap:8px;padding:14px 16px;border-top:1px solid var(--line);background:#0b0d12}
+.chat-input input{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:24px;padding:12px 16px;color:var(--ink);font-family:'Inter',sans-serif;font-size:.9rem}
+.chat-input input:focus{outline:none;border-color:var(--molten)}
+.chat-input button{flex:none;width:44px;height:44px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--molten),var(--molten-2));color:#1a0e04;font-size:1.1rem;transition:.2s}
+.chat-input button:hover{transform:scale(1.06)}
+@media(max-width:460px){.chat-panel{height:calc(100vh - 32px);bottom:16px;right:16px}.chat-launch{right:16px;bottom:16px}}
+
 /* ---------- CTA ---------- */
 .cta{position:relative;z-index:2;padding:140px 0;text-align:center}
 .cta h2{font-size:clamp(2.4rem,6vw,5rem)}
@@ -634,12 +684,28 @@ footer{position:relative;z-index:2;border-top:1px solid var(--line);padding:70px
   </div>
 </footer>
 
-<!-- Floating persistent CTA -->
-<button class="fab" id="fab" aria-label="Get a quote">
-  <span class="fab-pulse"></span>
-  <span class="fab-ic">✉</span>
-  <span class="fab-txt">Get a Quote</span>
+<!-- AI chat assistant -->
+<div class="chat-greet" id="chatGreet">
+  <span class="x" id="greetX">✕</span>
+  👋 Hi! Need a quote or product specs? <b>Ask me anything</b> — I reply instantly.
+</div>
+<button class="chat-launch" id="chatLaunch" aria-label="Open chat assistant">
+  <span class="ping"></span><span class="online"></span>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7A8.38 8.38 0 0 1 4 11.5 8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z"/></svg>
 </button>
+<div class="chat-panel" id="chatPanel" role="dialog" aria-label="Shengxi assistant">
+  <div class="chat-head">
+    <div class="chat-av">SX<span class="online"></span></div>
+    <div class="hh"><b>Shengxi Assistant</b><small>● Online · replies instantly</small></div>
+    <button class="cx" id="chatClose" aria-label="Close">✕</button>
+  </div>
+  <div class="chat-body" id="chatBody"></div>
+  <div class="chat-qr" id="chatQr"></div>
+  <form class="chat-input" id="chatForm">
+    <input id="chatText" type="text" placeholder="Type your message…" autocomplete="off">
+    <button type="submit" aria-label="Send">➤</button>
+  </form>
+</div>
 
 <!-- Inquiry modal (Alibaba-style product order form) -->
 <div class="modal" id="inquiryModal" role="dialog" aria-modal="true" aria-labelledby="invName">
@@ -1066,6 +1132,105 @@ function initInquiry(){
   });
 }
 
+/* ---------------- AI chat assistant ---------------- */
+function initChat(){
+  const launch = document.getElementById('chatLaunch');
+  const panel  = document.getElementById('chatPanel');
+  const body   = document.getElementById('chatBody');
+  const qr     = document.getElementById('chatQr');
+  const form   = document.getElementById('chatForm');
+  const text   = document.getElementById('chatText');
+  const greet  = document.getElementById('chatGreet');
+  if(!launch) return;
+  let started = false;
+
+  const scroll = ()=> body.scrollTop = body.scrollHeight;
+  function bubble(html, who){
+    const d = document.createElement('div');
+    d.className = 'msg ' + who; d.innerHTML = html;
+    body.appendChild(d); scroll(); return d;
+  }
+  function setQuickReplies(items){
+    qr.innerHTML = '';
+    items.forEach(it=>{
+      const b = document.createElement('button');
+      b.textContent = it.label;
+      b.onclick = ()=>{ bubble(it.label,'user'); qr.innerHTML=''; respond(it.value || it.label); };
+      qr.appendChild(b);
+    });
+  }
+  function botSay(html, replies, delay){
+    const tp = document.createElement('div');
+    tp.className = 'typing'; tp.innerHTML = '<i></i><i></i><i></i>';
+    body.appendChild(tp); scroll();
+    setTimeout(()=>{ tp.remove(); bubble(html,'bot'); if(replies) setQuickReplies(replies); }, delay || (650 + Math.random()*500));
+  }
+
+  const DEFAULT_QR = [
+    {label:'Get a quote', value:'__quote'},
+    {label:'Products', value:'products'},
+    {label:'Lead time', value:'lead time'},
+    {label:'Certifications', value:'certifications'},
+    {label:'Shipping & payment', value:'shipping'}
+  ];
+
+  function openModal(prod){ if(window.openInquiry){ openInquiry(prod||'General inquiry','assets/logo.png'); } }
+
+  function respond(raw){
+    const q = (raw||'').toLowerCase();
+    // direct actions
+    if(q==='__quote'){ botSay('Great — opening our quick quote form. Pick the product, quantity and trade term, and we’ll reply within 24 hours. 👇', null, 500); setTimeout(()=>openModal('General inquiry'),900); return; }
+    if(/\b(pipe|tube|tubular)\b/.test(q)){ botSay('Our <b>Seamless Steel Pipe</b> line covers Carbon Steel Pipe, Alloy Steel Tubes and Precision Steel Tube — for pressure and high-temperature service. Want a quote?',[{label:'Quote: Seamless Pipe',value:'__pipe'},{label:'Other products',value:'products'}]); return; }
+    if(q==='__pipe'){ openModal('Seamless Steel Pipe'); botSay('Opening the inquiry form for Seamless Steel Pipe. 👍',null,400); return; }
+    if(/\b(plate|sheet)\b/.test(q)){ botSay('We supply <b>Carbon Steel Plate</b> and <b>Alloy Steel Plate</b>, cut to size for fabrication and structural work.',[{label:'Quote: Steel Plate',value:'__plate'},{label:'Other products',value:'products'}]); return; }
+    if(q==='__plate'){ openModal('Steel Plate'); botSay('Opening the inquiry form for Steel Plate. 👍',null,400); return; }
+    if(/\b(bar|rod|round)\b/.test(q)){ botSay('Our <b>Steel Rods</b> include Carbon &amp; Alloy Steel Bars and Cold-Drawn Bright Bars — tight tolerance, fine finish.',[{label:'Quote: Steel Rods',value:'__rods'},{label:'Other products',value:'products'}]); return; }
+    if(q==='__rods'){ openModal('Steel Rods'); botSay('Opening the inquiry form for Steel Rods. 👍',null,400); return; }
+    if(/product|grade|catalog|what.*(sell|make|offer)|steel type/.test(q)){
+      botSay('We supply three core families plus special/bearing grades (GCr15, 16MnCr5, 18CrNiMo7-6, JIS SCM…). Which do you need?',
+        [{label:'Seamless Pipe',value:'pipe'},{label:'Steel Plate',value:'plate'},{label:'Steel Rods',value:'bar'},{label:'Get a quote',value:'__quote'}]); return; }
+    if(/price|quote|cost|rfq|moq|minimum|order/.test(q)){
+      botSay('I can get you a quote fast. MOQ is negotiable — just tell me the product, grade and quantity, or open the quick form.',
+        [{label:'Open quote form',value:'__quote'},{label:'Lead time',value:'lead time'}]); return; }
+    if(/lead|delivery|how long|time|when/.test(q)){
+      botSay('⏱ <b>Standard products:</b> 7–15 days after deposit. <b>Custom orders:</b> 15–45 days. <b>Sea shipping:</b> 15–40 days by destination.', DEFAULT_QR); return; }
+    if(/cert|iso|standard|quality|astm|jis|inspect|mtc|test/.test(q)){
+      botSay('✅ ISO 9001 certified, conforming to <b>ASTM, EN, JIS, GB</b>. Third-party inspection (<b>SGS / BV / TÜV</b>) and mill test certificates available on request.', DEFAULT_QR); return; }
+    if(/ship|fob|cif|exw|incoterm|deliver|freight|container/.test(q)){
+      botSay('🚢 We ship <b>FOB, CIF or EXW</b> (DDP/DAP for bulk). Anti-rust, waterproof, containerized (20ft/40ft, FCL/LCL).',
+        [{label:'Payment terms',value:'payment'},{label:'Get a quote',value:'__quote'}]); return; }
+    if(/pay|payment|deposit|t\/?t|l\/?c|terms/.test(q)){
+      botSay('💳 Payment: <b>30% T/T deposit + 70% before shipment</b>, or irrevocable <b>L/C at sight</b>. Flexible terms for long-term partners.', DEFAULT_QR); return; }
+    if(/sample/.test(q)){
+      botSay('Yes — free small samples (you cover shipping), and full-sample batches credited against future orders.', DEFAULT_QR); return; }
+    if(/contact|email|phone|whatsapp|call|human|agent|sales|talk/.test(q)){
+      botSay('📞 Sales: <b>+86 159 6250 6807</b><br>💬 WhatsApp: <a href="https://api.whatsapp.com/send?phone=13774477757" target="_blank">+86 137 7447 7757</a><br>✉ <a href="mailto:sam.li@sxsyltd.com">sam.li@sxsyltd.com</a>', DEFAULT_QR); return; }
+    if(/^(hi|hello|hey|good|greetings)/.test(q)){
+      botSay('Hello! 👋 How can I help — products, pricing, lead times or shipping?', DEFAULT_QR); return; }
+    if(/thank|thanks|cheers/.test(q)){
+      botSay('You’re welcome! Anything else I can help with? 🙂', DEFAULT_QR); return; }
+    // fallback
+    botSay('Good question — I’ll route that to our team. You can reach sales at <a href="mailto:sam.li@sxsyltd.com">sam.li@sxsyltd.com</a>, or get a fast quote below.', DEFAULT_QR);
+  }
+
+  function start(){
+    if(started) return; started = true;
+    botSay('Hi! 👋 I’m the <b>Shengxi steel assistant</b>. I can help with products, pricing, lead times, certifications and shipping.', DEFAULT_QR, 400);
+  }
+  function open(){ greet.classList.remove('show'); launch.classList.add('hide'); panel.classList.add('open'); start(); setTimeout(()=>text.focus(),200); }
+  function close(){ panel.classList.remove('open'); launch.classList.remove('hide'); }
+
+  launch.addEventListener('click', open);
+  document.getElementById('chatClose').addEventListener('click', close);
+  document.getElementById('greetX').addEventListener('click', e=>{ e.stopPropagation(); greet.classList.remove('show'); });
+  greet.addEventListener('click', open);
+  form.addEventListener('submit', e=>{ e.preventDefault(); const v=text.value.trim(); if(!v) return; bubble(v,'user'); qr.innerHTML=''; text.value=''; respond(v); });
+
+  // proactive greeting bubble
+  setTimeout(()=>{ if(!panel.classList.contains('open')) greet.classList.add('show'); }, 4200);
+  setTimeout(()=>{ greet.classList.remove('show'); }, 13000);
+}
+
 /* ---------------- Preloader ---------------- */
 function runPreloader(){
   const bar = document.getElementById('plBar');
@@ -1086,6 +1251,7 @@ function runPreloader(){
     initUI();
     initForm();
     initInquiry();
+    initChat();
   }
 }
 
