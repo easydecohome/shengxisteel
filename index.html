@@ -232,6 +232,33 @@ section.block{position:relative;z-index:2;padding:130px 0}
 .crow a:hover{color:var(--molten-2)}
 @media(max-width:880px){.contact-grid{grid-template-columns:1fr;gap:34px}}
 
+/* ---------- Request form ---------- */
+.form-card{border:1px solid var(--line);border-radius:20px;padding:34px;background:linear-gradient(160deg,rgba(255,255,255,.03),transparent);position:relative;overflow:hidden}
+.form-card::before{content:"";position:absolute;inset:0;background:radial-gradient(90% 60% at 100% 0%,rgba(255,106,26,.1),transparent 60%);pointer-events:none}
+.form-card h3{font-size:1.4rem;margin-bottom:6px}
+.form-card .sub{color:var(--muted);font-size:.9rem;margin-bottom:24px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.field{display:flex;flex-direction:column;gap:7px}
+.field.full{grid-column:1 / -1}
+.field label{font-family:'Space Grotesk';font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.field label .req{color:var(--molten-2)}
+.field input,.field select,.field textarea{
+  background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:10px;padding:13px 14px;
+  color:var(--ink);font-family:'Inter',sans-serif;font-size:.94rem;transition:border-color .25s,box-shadow .25s;width:100%}
+.field textarea{resize:vertical;min-height:96px}
+.field select{appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23ffb347' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+.field option{background:#0d0f14;color:var(--ink)}
+.field input::placeholder,.field textarea::placeholder{color:#5b6473}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--molten);box-shadow:0 0 0 3px rgba(255,106,26,.14)}
+.form-card .btn{margin-top:6px;width:100%;justify-content:center;border:none;cursor:pointer;font-size:.96rem}
+.form-note{margin-top:14px;font-size:.78rem;color:var(--muted);text-align:center}
+.form-msg{margin-top:16px;padding:14px 16px;border-radius:10px;font-size:.9rem;display:none}
+.form-msg.ok{display:block;background:rgba(46,160,90,.12);border:1px solid rgba(46,160,90,.4);color:#7fe3a6}
+.form-msg.err{display:block;background:rgba(220,70,50,.12);border:1px solid rgba(220,70,50,.4);color:#ff9d8c}
+@media(max-width:560px){.fgrid{grid-template-columns:1fr}}
+
 /* ---------- CTA ---------- */
 .cta{position:relative;z-index:2;padding:140px 0;text-align:center}
 .cta h2{font-size:clamp(2.4rem,6vw,5rem)}
@@ -479,10 +506,41 @@ footer{position:relative;z-index:2;border-top:1px solid var(--line);padding:70px
           <div class="crow"><div class="ico">⚲</div><div><small>Address</small><p>302-9, Building 2, Lane 103, Sizhuan Road, Sijing Town, Songjiang District, Shanghai</p></div></div>
         </div>
       </div>
-      <div class="frame reveal" style="aspect-ratio:3/4">
-        <img src="assets/hero-banner.jpg" alt="Shengxi steel mill">
-        <div class="glow"></div>
-        <div class="label"><small>Shanghai · China</small>Iron &amp; Steel Group Co., Ltd.</div>
+      <div class="form-card reveal">
+        <h3>Request product information</h3>
+        <p class="sub">Tell us what you need — we reply with availability, pricing and lead time.</p>
+        <form id="quoteForm" novalidate>
+          <div class="fgrid">
+            <div class="field"><label>Full name <span class="req">*</span></label><input name="name" type="text" placeholder="Your name" required></div>
+            <div class="field"><label>Company</label><input name="company" type="text" placeholder="Company name"></div>
+            <div class="field"><label>Email <span class="req">*</span></label><input name="email" type="email" placeholder="you@company.com" required></div>
+            <div class="field"><label>Phone / WhatsApp</label><input name="phone" type="text" placeholder="+86 …"></div>
+            <div class="field"><label>Country / region</label><input name="country" type="text" placeholder="Destination"></div>
+            <div class="field"><label>Product category <span class="req">*</span></label>
+              <select name="product" required>
+                <option value="" disabled selected>Select a product</option>
+                <option>Seamless Steel Pipe</option>
+                <option>Carbon Steel Pipe</option>
+                <option>Alloy Steel Tubes</option>
+                <option>Precision Steel Tube</option>
+                <option>Carbon Steel Plate</option>
+                <option>Alloy Steel Plate</option>
+                <option>Carbon Steel Bars</option>
+                <option>Alloy Steel Bars</option>
+                <option>Cold-Drawn Bright Bars</option>
+                <option>Special / Bearing Steel</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="field"><label>Grade / standard</label><input name="grade" type="text" placeholder="e.g. GCr15, 42CrMo, ASTM A106"></div>
+            <div class="field"><label>Quantity</label><input name="quantity" type="text" placeholder="e.g. 50 tons"></div>
+            <div class="field full"><label>Dimensions / specification</label><input name="dimensions" type="text" placeholder="OD × WT × length, thickness, diameter…"></div>
+            <div class="field full"><label>Additional details</label><textarea name="message" placeholder="Application, surface finish, certification or packaging requirements…"></textarea></div>
+          </div>
+          <button class="btn primary" type="submit">Send Request →</button>
+          <div class="form-note">Or email us directly at <a href="mailto:sam.li@sxsyltd.com" style="color:var(--molten-2)">sam.li@sxsyltd.com</a></div>
+          <div class="form-msg" id="formMsg" role="status" aria-live="polite"></div>
+        </form>
       </div>
     </div>
   </div>
@@ -736,6 +794,57 @@ function initUI(){
   });
 }
 
+/* ---------------- Quote / product request form ---------------- */
+// To use a hosted backend (e.g. Formspree), set FORM_ENDPOINT to your form URL,
+// e.g. 'https://formspree.io/f/xxxxxxx'. Leave '' to use the email fallback below.
+const FORM_ENDPOINT = '';
+const CONTACT_EMAIL = 'sam.li@sxsyltd.com';
+
+function initForm(){
+  const form = document.getElementById('quoteForm');
+  if(!form) return;
+  const msg = document.getElementById('formMsg');
+  const show = (text, ok) => { msg.textContent = text; msg.className = 'form-msg ' + (ok ? 'ok' : 'err'); };
+
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(form).entries());
+    if(!data.name || !data.email || !data.product){
+      show('Please fill in your name, email and product category.', false); return;
+    }
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email)){
+      show('Please enter a valid email address.', false); return;
+    }
+
+    // Option A: hosted endpoint (AJAX) when configured
+    if(FORM_ENDPOINT){
+      try{
+        const res = await fetch(FORM_ENDPOINT, { method:'POST', headers:{'Accept':'application/json'}, body:new FormData(form) });
+        if(res.ok){ form.reset(); show('Thank you — your request has been sent. We will reply shortly.', true); }
+        else { show('Something went wrong. Please email us at '+CONTACT_EMAIL+'.', false); }
+      }catch(err){ show('Network error. Please email us at '+CONTACT_EMAIL+'.', false); }
+      return;
+    }
+
+    // Option B: email fallback (no backend) — opens a pre-filled message
+    const subject = 'Product request: ' + data.product + ' — ' + (data.company || data.name);
+    const body =
+      'PRODUCT REQUEST\n\n' +
+      'Name:        ' + data.name + '\n' +
+      'Company:     ' + (data.company || '-') + '\n' +
+      'Email:       ' + data.email + '\n' +
+      'Phone:       ' + (data.phone || '-') + '\n' +
+      'Country:     ' + (data.country || '-') + '\n\n' +
+      'Product:     ' + data.product + '\n' +
+      'Grade/Std:   ' + (data.grade || '-') + '\n' +
+      'Quantity:    ' + (data.quantity || '-') + '\n' +
+      'Dimensions:  ' + (data.dimensions || '-') + '\n\n' +
+      'Details:\n' + (data.message || '-') + '\n';
+    window.location.href = 'mailto:' + CONTACT_EMAIL + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+    show('Opening your email app with the request pre-filled. If nothing happens, email '+CONTACT_EMAIL+'.', true);
+  });
+}
+
 /* ---------------- Preloader ---------------- */
 function runPreloader(){
   const bar = document.getElementById('plBar');
@@ -754,6 +863,7 @@ function runPreloader(){
     pre.classList.add('done');
     document.body.style.overflow='';
     initUI();
+    initForm();
   }
 }
 
